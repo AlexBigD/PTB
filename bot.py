@@ -1,6 +1,7 @@
 import telebot
 import main
 from telebot import types
+from decimal import Decimal
 
 bot = telebot.TeleBot(main.token_test)
 
@@ -18,15 +19,30 @@ def send_text(message):
         return handle_command(message)
 
 def hello(message):
-    main.sum = float(message)
+    main.sum = Decimal(message.text)
     data = main.stat()
-    for key, value in data.items():
+
+    for key,value in data.items():
         if key == main.oper_name:
-            main.currency = value[main.name_currency]
-    sum_custom = main.sum * main.currency
-    mes = "Операция на сумму {} по курсу {} за {} равна {} Р.".format(main.sum, main.currency,
-                                                                      main.name_currency.upper(), sum_custom)
-    bot.send_message(message.chat.id, mes)
+            if main.name_currency == "cny":
+                main.currency = Decimal(value[main.name_currency].replace(",", '.')) / 10
+            else:
+                main.currency = Decimal(value[main.name_currency].replace(",", '.'))
+            if main.oper_name == 'sell':
+                sum_custom = main.sum * (main.currency)
+                mes = "ПРОДАЖА: Операция на сумму {} {} по курсу {} за {} равна {} Р.".format(main.sum,
+                                                                                          main.name_currency.upper(),
+                                                                                          main.currency,
+                                                                                          main.name_currency.upper(),
+                                                                                          sum_custom)
+                bot.send_message(message.chat.id, mes)
+            elif main.oper_name == 'buy':
+                sum_custom = main.sum / (main.currency)
+                mes = "ПОКУПКА: Операция на сумму {} Р по курсу {} за {} равна {} {}.".format(main.sum, main.currency,
+                                                                                              main.name_currency.upper(),
+                                                                                              sum_custom,
+                                                                                              main.name_currency.upper())
+                bot.send_message(message.chat.id, mes)
 
 
 @bot.callback_query_handler(lambda a: True)
@@ -54,12 +70,5 @@ def start_answer(a):
         main.name_currency = a.data
         sent = bot.send_message(a.message.chat.id, 'Введите сумму в числовом эквиваленте без знаков')
         bot.register_next_step_handler(sent,hello)
-
-
-
-
-
-
-
 
 bot.polling(none_stop=True)

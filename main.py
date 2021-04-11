@@ -73,3 +73,5 @@ def stat():
             "buy": {'usd': usd_buy, 'eur': eur_buy, 'cny': cny_buy},
             }
     return data
+
+stat()
