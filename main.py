@@ -69,8 +69,8 @@ def stat():
     cny_sell = new_list[16]
     cny_buy = new_list[15]
 
-    data = {"sell": {'usd': usd_sell, 'eur': eur_sell, 'cny': cny_sell},
-            "buy": {'usd': usd_buy, 'eur': eur_buy, 'cny': cny_buy},
+    data = {"buy": {'usd': usd_sell, 'eur': eur_sell, 'cny': cny_sell},
+            "sell": {'usd': usd_buy, 'eur': eur_buy, 'cny': cny_buy},
             }
     return data
 
